@@ -82,9 +82,13 @@ Aucune variable d'environnement, aucun service externe.
 | `/clubs` | Les 16 clubs, groupés par région |
 | `/clubs/[slug]` | Fiche par club : identité, stade, kilomètres, calendrier complet — 16 pages prérendues |
 | `/carte` | Les clubs sur la carte de Tunisie + classement des distances |
+| `/derbys` | Les 12 affiches, leur distance et la journée où elles tombent |
 | `/simulateur` | Choisir le vainqueur des 240 matchs, classement en direct |
 | `/palmares` | Titres par club et 25 dernières saisons |
-| `/quiz` | Reconnaître les écussons |
+| `/quiz` | Couleurs, stades, villes, fondations — sans logo, sinon la réponse se lit dessus |
+| `/methode` | La méthode complète, en six chapitres |
+
+Chaque fiche de club possède sa propre vignette de partage (`opengraph-image`), générée au build avec l'écusson du club : un supporter partage son club, pas un lien générique.
 
 Toutes ces pages sont statiques : rien n'est calculé à l'exécution, l'hébergement reste gratuit. Le site est aussi installable (manifeste web).
 

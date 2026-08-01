@@ -12,9 +12,11 @@ import { T } from "@/lib/i18n";
 const NAV = [
   { href: "/clubs", label: T.fr.navClubs },
   { href: "/carte", label: T.fr.navMap },
+  { href: "/derbys", label: T.fr.navDerbies },
   { href: "/simulateur", label: T.fr.navSimulator },
   { href: "/palmares", label: T.fr.navPalmares },
   { href: "/quiz", label: T.fr.navQuiz },
+  { href: "/methode", label: T.fr.navMethod },
 ];
 
 export function SiteHeader({ active }: { active?: string }) {

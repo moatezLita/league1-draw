@@ -11,9 +11,10 @@ import { teamCity, teamName } from "./shared";
 const EXPLORE = [
   { href: "/clubs", key: "navClubs" as const },
   { href: "/carte", key: "navMap" as const },
+  { href: "/derbys", key: "navDerbies" as const },
   { href: "/simulateur", key: "navSimulator" as const },
   { href: "/palmares", key: "navPalmares" as const },
-  { href: "/quiz", key: "navQuiz" as const },
+  { href: "/methode", key: "navMethod" as const },
 ];
 
 /**
