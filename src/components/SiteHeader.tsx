@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { T } from "@/lib/i18n";
 
 /**
  * En-tête des pages éditoriales (fiches de club, carte, simulateur…).
@@ -6,52 +7,55 @@ import Link from "next/link";
  * L'application de tirage garde son propre en-tête : c'est une console, elle a
  * besoin de ses outils, pas d'une navigation de site.
  */
+// Libellés repris du dictionnaire français, pour que la barre soit rigoureusement
+// identique à celle de l'application.
 const NAV = [
-  { href: "/clubs", label: "Clubs" },
-  { href: "/carte", label: "Carte" },
-  { href: "/simulateur", label: "Simulateur" },
-  { href: "/palmares", label: "Palmarès" },
-  { href: "/quiz", label: "Quiz" },
+  { href: "/clubs", label: T.fr.navClubs },
+  { href: "/carte", label: T.fr.navMap },
+  { href: "/simulateur", label: T.fr.navSimulator },
+  { href: "/palmares", label: T.fr.navPalmares },
+  { href: "/quiz", label: T.fr.navQuiz },
 ];
 
 export function SiteHeader({ active }: { active?: string }) {
   return (
-    <header className="no-print sticky top-0 z-40 border-b border-line bg-canvas/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
-        <Link href="/" className="flex shrink-0 items-center gap-3 transition hover:opacity-80">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-flag text-sm font-black text-white">
-            1
+    // Mêmes classes que l'en-tête de l'application : même hauteur, mêmes
+    // marges, pleine largeur. Contraint à max-w-5xl, il paraissait plus étroit
+    // que celui de l'accueil et la barre « sautait » d'une page à l'autre.
+    <header className="no-print sticky top-0 z-40 flex h-14 shrink-0 items-center gap-3 border-b border-line bg-canvas/75 px-4 backdrop-blur-xl">
+      <Link href="/" className="flex shrink-0 items-center gap-3 transition hover:opacity-80">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-flag text-sm font-black text-white">
+          1
+        </span>
+        <span className="hidden min-w-0 md:block">
+          <span className="block truncate text-sm font-bold leading-tight">Tirage LP1</span>
+          <span className="block truncate text-[11px] leading-tight text-mute">
+            Saison 2026 · 2027
           </span>
-          <span className="hidden sm:block">
-            <span className="block text-sm font-bold leading-tight">Tirage LP1</span>
-            <span className="block text-[11px] leading-tight text-mute">Saison 2026 · 2027</span>
-          </span>
-        </Link>
+        </span>
+      </Link>
 
-        <nav className="flex flex-1 items-center gap-0.5 overflow-x-auto">
-          {NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              aria-current={active === n.href ? "page" : undefined}
-              className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
-                active === n.href
-                  ? "bg-sunken text-ink"
-                  : "text-mute hover:bg-sunken hover:text-ink"
-              }`}
-            >
-              {n.label}
-            </Link>
-          ))}
-        </nav>
+      <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto">
+        {NAV.map((n) => (
+          <Link
+            key={n.href}
+            href={n.href}
+            aria-current={active === n.href ? "page" : undefined}
+            className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
+              active === n.href ? "bg-sunken text-ink" : "text-mute hover:bg-sunken hover:text-ink"
+            }`}
+          >
+            {n.label}
+          </Link>
+        ))}
+      </nav>
 
-        <Link
-          href="/"
-          className="shrink-0 rounded-lg bg-flag px-3.5 py-2 text-xs font-bold text-white shadow-sm shadow-flag/25 transition hover:bg-flag-soft"
-        >
-          Lancer un tirage
-        </Link>
-      </div>
+      <Link
+        href="/"
+        className="shrink-0 rounded-lg bg-flag px-3.5 py-2 text-xs font-bold text-white shadow-sm shadow-flag/25 transition hover:bg-flag-soft"
+      >
+        Lancer un tirage
+      </Link>
     </header>
   );
 }

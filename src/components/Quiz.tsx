@@ -1,60 +1,134 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { TEAMS, type Team } from "@/lib/teams";
 import { Crest } from "./Crest";
 
 const ROUNDS = 10;
 
+/**
+ * Quatre familles de questions.
+ *
+ * L'écusson n'est jamais montré avec son logo officiel : ceux-ci portent le
+ * nom du club écrit dessus, la question se lisait donc directement sur
+ * l'image. On n'affiche que les couleurs, et on varie avec des questions
+ * tirées des données (stade, ville, fondation).
+ */
+type Kind = "colors" | "stadium" | "city" | "founded";
+
 interface Question {
+  kind: Kind;
   answer: Team;
   choices: Team[];
 }
 
-function pick<T>(arr: T[], n: number): T[] {
-  const copy = [...arr];
-  const out: T[] = [];
-  while (out.length < n && copy.length) {
-    out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
 }
 
-function makeQuestion(): Question {
-  const [answer] = pick(TEAMS, 1);
-  const others = pick(
-    TEAMS.filter((t) => t.id !== answer.id),
-    3,
-  );
-  return { answer, choices: pick([answer, ...others], 4) };
+const PROMPT: Record<Kind, (t: Team) => string> = {
+  colors: () => "Quel club porte ces couleurs ?",
+  stadium: (t) => `Quel club reçoit au ${t.stadium} ?`,
+  city: (t) => `Quel club est basé à ${t.city} ?`,
+  founded: (t) => `Quel club a été fondé en ${t.founded} ?`,
+};
+
+/**
+ * Signature discriminante par type de question : deux clubs qui la partagent
+ * rendent la question ambiguë.
+ *
+ * Le cas qui a motivé ce mécanisme : l'Espérance et le Club Africain reçoivent
+ * tous deux à Radès, et six clubs se réclament du Grand Tunis. « Quel club
+ * reçoit au stade Hammadi Agrebi ? » avait donc deux bonnes réponses.
+ */
+const SIGNATURE: Record<Kind, (t: Team) => string> = {
+  colors: (t) => `${t.colors.primary}|${t.colors.secondary}`,
+  stadium: (t) => t.venue,
+  city: (t) => t.city,
+  founded: (t) => String(t.founded),
+};
+
+/** Un club ne peut être la réponse que si sa signature est unique en Ligue 1. */
+function eligibleKinds(team: Team): Kind[] {
+  return (Object.keys(SIGNATURE) as Kind[]).filter((kind) => {
+    const sig = SIGNATURE[kind](team);
+    return !TEAMS.some((other) => other.id !== team.id && SIGNATURE[kind](other) === sig);
+  });
+}
+
+/**
+ * Dix clubs distincts, tirés une fois pour toutes : la version initiale tirait
+ * au sort à chaque question et reposait donc régulièrement le même club.
+ */
+export function buildQuiz(): Question[] {
+  const used = new Map<Kind, number>();
+
+  return shuffle(TEAMS)
+    .slice(0, ROUNDS)
+    .map((answer) => {
+      // Parmi les types possibles pour ce club, on prend le moins servi :
+      // les questions restent variées sans jamais devenir ambiguës.
+      const kinds = eligibleKinds(answer);
+      const kind = shuffle(kinds).sort(
+        (a, b) => (used.get(a) ?? 0) - (used.get(b) ?? 0),
+      )[0];
+      used.set(kind, (used.get(kind) ?? 0) + 1);
+
+      const sig = SIGNATURE[kind](answer);
+      const pool = TEAMS.filter(
+        (t) => t.id !== answer.id && SIGNATURE[kind](t) !== sig,
+      );
+      return { kind, answer, choices: shuffle([answer, ...shuffle(pool).slice(0, 3)]) };
+    });
 }
 
 export function Quiz() {
-  const [q, setQ] = useState<Question | null>(null);
+  const [quiz, setQuiz] = useState<Question[] | null>(null);
   const [step, setStep] = useState(0);
   const [score, setScore] = useState(0);
   const [chosen, setChosen] = useState<string | null>(null);
 
-  // La première question naît d'un clic, jamais du rendu : tirer au sort
-  // pendant le rendu ferait diverger le HTML du serveur et celui du client.
+  // Le tirage a lieu sur un clic, jamais pendant le rendu : le hasard ferait
+  // diverger le HTML du serveur de celui du client.
   const start = () => {
+    setQuiz(buildQuiz());
     setScore(0);
     setStep(0);
     setChosen(null);
-    setQ(makeQuestion());
   };
-
-  const next = useCallback(() => {
-    setChosen(null);
-    setStep((s) => s + 1);
-    setQ(makeQuestion());
-  }, []);
 
   const answer = (id: string) => {
-    if (chosen || !q) return;
+    if (chosen || !quiz) return;
     setChosen(id);
-    if (id === q.answer.id) setScore((s) => s + 1);
+    if (id === quiz[step].answer.id) setScore((s) => s + 1);
   };
+
+  const next = () => {
+    setChosen(null);
+    setStep((s) => s + 1);
+  };
+
+  if (!quiz) {
+    return (
+      <div className="panel mx-auto max-w-md p-8 text-center">
+        <p className="text-sm leading-relaxed text-mute">
+          Dix questions sur les seize clubs de Ligue 1 : couleurs, stades, villes et années de
+          fondation. Chaque club n&apos;apparaît qu&apos;une fois.
+        </p>
+        <button
+          onClick={start}
+          className="mt-5 rounded-xl bg-flag px-6 py-3 text-sm font-bold text-white shadow-lg shadow-flag/25 transition hover:bg-flag-soft active:scale-[0.98]"
+        >
+          Commencer le quiz
+        </button>
+      </div>
+    );
+  }
 
   if (step >= ROUNDS) {
     const verdict =
@@ -83,21 +157,7 @@ export function Quiz() {
     );
   }
 
-  if (!q) {
-    return (
-      <div className="panel mx-auto max-w-md p-8 text-center">
-        <p className="text-sm leading-relaxed text-mute">
-          Dix écussons, dix questions. Aucune limite de temps — seulement votre mémoire.
-        </p>
-        <button
-          onClick={start}
-          className="mt-5 rounded-xl bg-flag px-6 py-3 text-sm font-bold text-white shadow-lg shadow-flag/25 transition hover:bg-flag-soft active:scale-[0.98]"
-        >
-          Commencer le quiz
-        </button>
-      </div>
-    );
-  }
+  const q = quiz[step];
 
   return (
     <div className="panel mx-auto max-w-md p-6 text-center">
@@ -114,10 +174,17 @@ export function Quiz() {
         />
       </div>
 
-      <div className="mt-7 flex justify-center">
-        <Crest team={q.answer} size={104} />
-      </div>
-      <p className="mt-4 text-sm font-semibold">Quel est ce club ?</p>
+      {/* L'écusson muet n'est montré que pour la question sur les couleurs :
+          ailleurs il donnerait la réponse. */}
+      {q.kind === "colors" && (
+        <div className="mt-7 flex justify-center">
+          <Crest team={q.answer} size={104} plain />
+        </div>
+      )}
+
+      <p className={`text-sm font-semibold ${q.kind === "colors" ? "mt-4" : "mt-8"}`}>
+        {PROMPT[q.kind](q.answer)}
+      </p>
 
       <ul className="mt-5 grid gap-2">
         {q.choices.map((c) => {

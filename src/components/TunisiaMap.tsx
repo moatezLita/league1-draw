@@ -64,14 +64,16 @@ export function TunisiaMap({ clubs }: { clubs: MapClub[] }) {
                 onClick={() => setActive(c.id)}
                 className="cursor-pointer"
               >
+                {/* Pas de transition sur le rayon : un cercle qui grandit sous
+                    le curseur repasse la frontière survol/non-survol pendant
+                    l'animation. On marque la sélection par le contour. */}
                 <circle
                   cx={c.mx}
                   cy={c.my}
-                  r={active === c.id ? 30 : 24}
+                  r={26}
                   fill={c.color}
-                  stroke="white"
-                  strokeWidth={4}
-                  className="transition-all"
+                  stroke={active === c.id ? "var(--color-ink)" : "white"}
+                  strokeWidth={active === c.id ? 6 : 4}
                 />
                 <text
                   x={c.mx}
@@ -95,7 +97,14 @@ export function TunisiaMap({ clubs }: { clubs: MapClub[] }) {
 
       {/* ─── panneau ─────────────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <div className="panel p-4">
+        {/**
+         * Hauteur minimale figée. Sans elle, passer d'un état à l'autre change
+         * la hauteur du panneau, ce qui décale la liste située en dessous : le
+         * curseur se retrouve sur une autre ligne, la sélection change, le
+         * panneau se redimensionne… et le tout clignote plusieurs fois par
+         * seconde.
+         */}
+        <div className="panel min-h-58 p-4">
           {sel ? (
             <>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-mute">

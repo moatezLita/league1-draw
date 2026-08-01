@@ -19,15 +19,22 @@ export function Crest({
   team,
   size = 40,
   className = "",
+  plain = false,
 }: {
   team: Team;
   size?: number;
   className?: string;
+  /**
+   * Écusson muet : couleurs seules, ni logo officiel ni sigle. Le quiz en a
+   * besoin — un vrai logo porte le nom du club écrit dessus, ce qui rend la
+   * question sans intérêt.
+   */
+  plain?: boolean;
 }) {
   const uid = useId().replace(/[:]/g, "");
   const { primary, secondary, text } = team.colors;
 
-  if (team.logo) {
+  if (team.logo && !plain) {
     // Balise <img> volontaire : l'écusson est un fichier local déjà dimensionné,
     // l'optimiseur d'images de Next consommerait du quota Vercel pour rien.
     return (
@@ -76,18 +83,20 @@ export function Crest({
           restent détachés du fond de page. */}
       <path d={SHIELD} fill="none" stroke="rgba(255,255,255,0.30)" strokeWidth="2.5" />
       <path d={SHIELD} fill="none" stroke="rgba(13,21,32,0.28)" strokeWidth="1.25" />
-      <text
-        x="24"
-        y="41"
-        textAnchor="middle"
-        fill={text}
-        fontSize={team.abbr.length > 3 ? 12 : 15}
-        fontWeight="800"
-        letterSpacing="-0.5"
-        style={{ fontFamily: "var(--font-sans)" }}
-      >
-        {team.abbr}
-      </text>
+      {!plain && (
+        <text
+          x="24"
+          y="41"
+          textAnchor="middle"
+          fill={text}
+          fontSize={team.abbr.length > 3 ? 12 : 15}
+          fontWeight="800"
+          letterSpacing="-0.5"
+          style={{ fontFamily: "var(--font-sans)" }}
+        >
+          {team.abbr}
+        </text>
+      )}
     </svg>
   );
 }
