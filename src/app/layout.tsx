@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Kufi_Arabic } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AUTHOR } from "@/lib/site";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" });
@@ -12,19 +13,8 @@ const title = "Tirage LP1 — Calendrier Ligue 1 Tunisie 2026/2027";
 const description =
   "Générez en moins de 50 ms un calendrier complet, équilibré et sans conflit pour la Ligue Professionnelle 1 tunisienne 2026-2027. Tout est calculé dans votre navigateur, la graine est publique, le tirage est reproductible par n'importe qui.";
 
-/**
- * Base absolue des URLs de partage (image OG, canonique).
- * Vercel fournit le domaine de production automatiquement ; en local on retombe
- * sur localhost. Définir NEXT_PUBLIC_SITE_URL pour forcer un domaine personnalisé.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title,
   description,
   alternates: { canonical: "/" },
