@@ -74,6 +74,24 @@ export function Landing({
             </span>
           ))}
         </div>
+
+        {/* Les autres pages, juste sous le pli : enterrées en bas de page,
+            elles n'existaient pour personne. */}
+        <ul className="mt-9 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {EXPLORE.map((e) => (
+            <li key={e.href}>
+              <Link
+                href={e.href}
+                className="panel lift flex items-center justify-between gap-3 p-4 text-sm font-bold"
+              >
+                {t[e.key]}
+                <span className="text-mute rtl:rotate-180" aria-hidden>
+                  →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ─── pourquoi ────────────────────────────────────────────────────── */}
@@ -127,26 +145,6 @@ export function Landing({
                   <span className="block truncate text-[11px] text-mute">
                     {teamCity(team, lang)}
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ─── explorer ────────────────────────────────────────────────────── */}
-      <section className="border-t border-line py-12 sm:py-16">
-        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">{t.exploreTitle}</h2>
-        <ul className="mt-6 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-          {EXPLORE.map((e) => (
-            <li key={e.href}>
-              <Link
-                href={e.href}
-                className="panel lift flex items-center justify-between gap-3 p-4 text-sm font-bold"
-              >
-                {t[e.key]}
-                <span className="text-mute rtl:rotate-180" aria-hidden>
-                  →
                 </span>
               </Link>
             </li>

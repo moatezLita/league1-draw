@@ -10,9 +10,19 @@ import { Crest } from "./Crest";
 import { RoundsView } from "./RoundsView";
 import { TeamView } from "./TeamView";
 import { GridView } from "./GridView";
+import Link from "next/link";
 import { AuditView } from "./AuditView";
 import { PrintSheet } from "./PrintSheet";
 import { Landing } from "./Landing";
+
+/** Les autres pages du site, atteignables depuis n'importe quel écran. */
+const SITE_NAV = [
+  { href: "/clubs", key: "navClubs" as const },
+  { href: "/carte", key: "navMap" as const },
+  { href: "/simulateur", key: "navSimulator" as const },
+  { href: "/palmares", key: "navPalmares" as const },
+  { href: "/quiz", key: "navQuiz" as const },
+];
 
 type Phase = "idle" | "drawing" | "done";
 type Tab = "rounds" | "teams" | "grid" | "audit";
@@ -196,18 +206,33 @@ export function DrawApp() {
             onClick={goHome}
             disabled={phase === "idle"}
             aria-label={t.backHome}
-            className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-start transition disabled:cursor-default enabled:hover:opacity-80"
+            className="flex shrink-0 items-center gap-3 rounded-lg text-start transition disabled:cursor-default enabled:hover:opacity-80"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-flag text-sm font-black text-white">
               1
             </span>
-            <span className="min-w-0 flex-1">
+            <span className="hidden min-w-0 md:block">
               <span className="block truncate text-sm font-bold leading-tight">{t.brand}</span>
               <span className="block truncate text-[11px] leading-tight text-mute">
                 {t.season}
               </span>
             </span>
           </button>
+
+          {/* Navigation du site : présente aussi bien sur l'accueil que dans la
+              console, sinon les autres pages ne sont atteignables qu'en bas de
+              la page d'accueil. */}
+          <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto">
+            {SITE_NAV.map((n) => (
+              <Link
+                key={n.href}
+                href={n.href}
+                className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-mute transition hover:bg-sunken hover:text-ink"
+              >
+                {t[n.key]}
+              </Link>
+            ))}
+          </nav>
 
           {phase !== "idle" && (
             <button
@@ -222,7 +247,7 @@ export function DrawApp() {
           {phase === "idle" ? (
             <a
               href="#contact"
-              className="hidden shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-mute transition hover:text-ink sm:block"
+              className="hidden shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-mute transition hover:text-ink lg:block"
             >
               {t.contactKicker}
             </a>
