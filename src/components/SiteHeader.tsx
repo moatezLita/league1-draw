@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { T } from "@/lib/i18n";
+import { LangPin } from "./LangPin";
 
 /**
  * En-tête des pages éditoriales (fiches de club, carte, simulateur…).
@@ -25,6 +26,10 @@ export function SiteHeader({ active }: { active?: string }) {
     // marges, pleine largeur. Contraint à max-w-5xl, il paraissait plus étroit
     // que celui de l'accueil et la barre « sautait » d'une page à l'autre.
     <header className="no-print sticky top-0 z-40 flex h-14 shrink-0 items-center gap-3 border-b border-line bg-canvas/75 px-4 backdrop-blur-xl">
+      {/* Ces pages sont en français : on le déclare, sinon le document garde
+          la direction laissée par l'application (arabe = RTL). */}
+      <LangPin lang="fr" />
+
       <Link href="/" className="flex shrink-0 items-center gap-3 transition hover:opacity-80">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-flag text-sm font-black text-white">
           1

@@ -5,6 +5,12 @@ import { DEFAULT_OPTIONS, generateDraw, type DrawOptions } from "@/lib/draw";
 import { decodeSeed, encodeSeed, freshSeed } from "@/lib/rng";
 import { downloadCsv, downloadIcs } from "@/lib/export";
 import { DIR, LANGS, T, isLang, nf, type Lang } from "@/lib/i18n";
+import {
+  readStoredLang,
+  readStoredLangOnServer,
+  storeLang,
+  subscribeLang,
+} from "@/lib/lang-store";
 import { TEAMS } from "@/lib/teams";
 import { Crest } from "./Crest";
 import { RoundsView } from "./RoundsView";
@@ -92,7 +98,17 @@ export function DrawApp() {
   const [copied, setCopied] = useState(false);
 
   const urlLang = params.get("lang");
-  const lang: Lang = isLang(urlLang) ? urlLang : isLang(navLang) ? navLang : "fr";
+  // Ordre de résolution : ce que dit l'URL, puis le choix mémorisé du visiteur,
+  // puis la langue du navigateur. Le stockage sert au retour depuis les pages
+  // éditoriales, qui sont en français et n'emportent pas le paramètre.
+  const storedLang = useSyncExternalStore(
+    subscribeLang,
+    readStoredLang,
+    readStoredLangOnServer,
+  );
+  const lang: Lang = isLang(urlLang)
+    ? urlLang
+    : (storedLang ?? (isLang(navLang) ? navLang : "fr"));
   const options = urlOptions;
   const result = urlResult;
   // Sans résultat on est à l'accueil, quoi qu'ait pu laisser traîner le minuteur.
@@ -160,7 +176,10 @@ export function DrawApp() {
   }, [buildUrl]);
 
   /** La langue ne mérite pas une entrée d'historique : on remplace. */
-  const changeLang = (l: Lang) => navigate(buildUrl({ lang: l }), { replace: true });
+  const changeLang = (l: Lang) => {
+    storeLang(l);
+    navigate(buildUrl({ lang: l }), { replace: true });
+  };
 
   const applySeed = () => {
     const s = decodeSeed(seedInput);
