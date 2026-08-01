@@ -44,9 +44,12 @@ export interface Team {
    * Laisser vide => écusson vectoriel généré (aucune image à charger, 0 ko).
    */
   logo?: string;
+  /** Segment d'URL de la fiche du club, ex. "esperance-tunis". */
+  slug: string;
 }
 
-export const TEAMS: Team[] = [
+/** Données brutes ; le slug et l'écusson sont attachés juste après. */
+const RAW: Array<Omit<Team, "slug">> = [
   {
     id: "est",
     abbr: "EST",
@@ -330,6 +333,30 @@ export const TEAMS: Team[] = [
  * de source libre exploitable. Pour en ajouter un : déposer le fichier dans
  * `public/logos/` et l'inscrire ici.
  */
+/**
+ * Segments d'URL des fiches de club. Écrits à la main plutôt que dérivés du
+ * nom : une URL indexée ne doit jamais changer parce qu'on a corrigé une
+ * majuscule ou un accent dans le nom du club.
+ */
+const SLUGS: Record<string, string> = {
+  est: "esperance-tunis",
+  ca: "club-africain",
+  css: "club-sportif-sfaxien",
+  st: "stade-tunisien",
+  usm: "us-monastir",
+  ess: "etoile-du-sahel",
+  esz: "es-zarzis",
+  esm: "es-metlaoui",
+  jso: "js-omrane",
+  usbg: "us-ben-guerdane",
+  asm: "as-marsa",
+  cab: "ca-bizertin",
+  ob: "olympique-beja",
+  eshs: "es-hammam-sousse",
+  psse: "ps-sakiet-eddaier",
+  cshl: "cs-hammam-lif",
+};
+
 const LOGOS: Record<string, string> = {
   est: "/logos/est.png",
   ca: "/logos/ca.png",
@@ -348,12 +375,18 @@ const LOGOS: Record<string, string> = {
   cshl: "/logos/cshl.png",
 };
 
-for (const t of TEAMS) {
-  if (LOGOS[t.id]) t.logo = LOGOS[t.id];
-}
+export const TEAMS: Team[] = RAW.map((t) => ({
+  ...t,
+  slug: SLUGS[t.id],
+  ...(LOGOS[t.id] ? { logo: LOGOS[t.id] } : {}),
+}));
 
 export const TEAM_BY_ID: Record<string, Team> = Object.fromEntries(
   TEAMS.map((t) => [t.id, t]),
+);
+
+export const TEAM_BY_SLUG: Record<string, Team> = Object.fromEntries(
+  TEAMS.map((t) => [t.slug, t]),
 );
 
 /**

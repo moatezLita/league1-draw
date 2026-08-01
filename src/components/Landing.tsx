@@ -1,10 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import type { Dict, Lang } from "@/lib/i18n";
 import { TEAMS } from "@/lib/teams";
 import { AUTHOR, MAILTO } from "@/lib/site";
 import { Crest } from "./Crest";
+import { Countdown } from "./Countdown";
 import { teamCity, teamName } from "./shared";
+
+const EXPLORE = [
+  { href: "/clubs", key: "navClubs" as const },
+  { href: "/carte", key: "navMap" as const },
+  { href: "/simulateur", key: "navSimulator" as const },
+  { href: "/palmares", key: "navPalmares" as const },
+  { href: "/quiz", key: "navQuiz" as const },
+];
 
 /**
  * Page d'accueil.
@@ -51,6 +61,10 @@ export function Landing({
             {t.cta}
           </button>
           <span className="text-xs text-mute">{t.heroHint}</span>
+        </div>
+
+        <div className="mt-5">
+          <Countdown t={t} />
         </div>
 
         <div className="mt-9 flex flex-wrap gap-2">
@@ -102,12 +116,39 @@ export function Landing({
 
         <ul className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
           {TEAMS.map((team) => (
-            <li key={team.id} className="panel lift flex items-center gap-3 p-3">
-              <Crest team={team} size={34} />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-bold">{teamName(team, lang)}</p>
-                <p className="truncate text-[11px] text-mute">{teamCity(team, lang)}</p>
-              </div>
+            <li key={team.id}>
+              <Link
+                href={`/clubs/${team.slug}`}
+                className="panel lift flex items-center gap-3 p-3"
+              >
+                <Crest team={team} size={34} />
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-bold">{teamName(team, lang)}</span>
+                  <span className="block truncate text-[11px] text-mute">
+                    {teamCity(team, lang)}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ─── explorer ────────────────────────────────────────────────────── */}
+      <section className="border-t border-line py-12 sm:py-16">
+        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">{t.exploreTitle}</h2>
+        <ul className="mt-6 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          {EXPLORE.map((e) => (
+            <li key={e.href}>
+              <Link
+                href={e.href}
+                className="panel lift flex items-center justify-between gap-3 p-4 text-sm font-bold"
+              >
+                {t[e.key]}
+                <span className="text-mute rtl:rotate-180" aria-hidden>
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

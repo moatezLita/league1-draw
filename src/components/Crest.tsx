@@ -1,3 +1,7 @@
+"use client";
+
+// `useId` est un hook client : la directive est nécessaire depuis que des
+// pages rendues côté serveur (fiches de club, carte) affichent des écussons.
 import { useId } from "react";
 import type { Team } from "@/lib/teams";
 

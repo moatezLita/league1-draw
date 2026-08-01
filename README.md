@@ -74,6 +74,22 @@ Aucune variable d'environnement, aucun service externe.
 - **Écussons officiels** pour 15 clubs sur 16, avec repli automatique sur un écusson vectoriel généré
 - **Déterministe** : même graine = même calendrier, toujours. Graines différentes = calendriers différents (4 matchs identiques sur 240 entre deux graines)
 
+### Les pages du site
+
+| Page | Contenu |
+|---|---|
+| `/` | Présentation, puis la console de tirage |
+| `/clubs` | Les 16 clubs, groupés par région |
+| `/clubs/[slug]` | Fiche par club : identité, stade, kilomètres, calendrier complet — 16 pages prérendues |
+| `/carte` | Les clubs sur la carte de Tunisie + classement des distances |
+| `/simulateur` | Choisir le vainqueur des 240 matchs, classement en direct |
+| `/palmares` | Titres par club et 25 dernières saisons |
+| `/quiz` | Reconnaître les écussons |
+
+Toutes ces pages sont statiques : rien n'est calculé à l'exécution, l'hébergement reste gratuit. Le site est aussi installable (manifeste web).
+
+Les pages autres que l'accueil sont en français uniquement — c'est la langue de recherche dominante pour le football tunisien, et cela évite de tripler des URLs indexées pour du contenu identique.
+
 ### Impression et PDF
 
 Le bouton « Imprimer / PDF » ne met pas la page à l'échelle : il produit un **document distinct**, rendu par [`PrintSheet.tsx`](src/components/PrintSheet.tsx) — les 30 journées sur deux colonnes, en-tête avec la graine, environ 4 pages A4. L'interface (en-tête, onglets, boutons) est entièrement masquée à l'impression.
