@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Kufi_Arabic } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { AUTHOR } from "@/lib/site";
 import "./globals.css";
 
@@ -66,7 +67,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       dir="ltr"
       className={`${geistSans.variable} ${geistMono.variable} ${kufi.variable} h-full antialiased`}
     >
-      <body className="aura relative flex min-h-full flex-col">{children}</body>
+      <body className="aura relative flex min-h-full flex-col">
+        {children}
+        {/* Mesure d'audience Vercel : aucun cookie, aucune donnée personnelle.
+            Le script n'est injecté qu'en production, pas en développement. */}
+        <Analytics />
+      </body>
     </html>
   );
 }
