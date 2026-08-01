@@ -259,7 +259,9 @@ export function DrawApp() {
             <button
               type="button"
               onClick={goHome}
-              className="shrink-0 rounded-lg border border-line bg-surface px-3 py-2 text-xs font-semibold shadow-sm transition hover:border-line-strong hover:bg-sunken"
+              // Masqué sur téléphone : l'écusson de gauche ramène déjà à
+              // l'accueil, et ces 80 px manquaient à la navigation.
+              className="hidden shrink-0 rounded-lg border border-line bg-surface px-3 py-2 text-xs font-semibold shadow-sm transition hover:border-line-strong hover:bg-sunken sm:block"
             >
               {t.backHome}
             </button>
@@ -326,8 +328,11 @@ export function DrawApp() {
         {result && phase === "done" && (
           <div className="flex min-h-0 flex-1 flex-col">
             {/* barre de contrôle : mesures à gauche, actions à droite */}
-            <div className="no-print flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-4 py-2.5">
-              <div className="flex items-center gap-3 text-xs">
+            {/* Sur téléphone la barre défile horizontalement plutôt que de
+                passer à la ligne : dans une console à hauteur d'écran, trois
+                rangées d'outils mangeaient la place du calendrier. */}
+            <div className="no-print flex shrink-0 items-center gap-x-4 gap-y-2 overflow-x-auto border-b border-line px-4 py-2.5 sm:flex-wrap sm:overflow-x-visible">
+              <div className="flex shrink-0 items-center gap-3 text-xs">
                 <Chip
                   value={`${stats!.computeMs.toFixed(1)} ms`}
                   label={t.statCompute}
@@ -342,7 +347,7 @@ export function DrawApp() {
                 />
               </div>
 
-              <div className="flex flex-1 flex-wrap items-center justify-end gap-1.5">
+              <div className="flex flex-1 shrink-0 items-center gap-1.5 sm:flex-wrap sm:justify-end">
                 <div className="flex items-center gap-1.5 rounded-lg border border-line bg-surface px-2 py-1 shadow-sm">
                   <label htmlFor="seed" className="text-[10px] font-semibold uppercase text-mute">
                     {t.optSeed}

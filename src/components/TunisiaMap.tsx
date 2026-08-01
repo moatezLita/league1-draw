@@ -33,7 +33,9 @@ export function TunisiaMap({ clubs }: { clubs: MapClub[] }) {
       <div className="panel relative overflow-hidden p-3">
         <svg
           viewBox={`-40 -40 ${MAP_WIDTH + 80} ${MAP_HEIGHT + 80}`}
-          className="mx-auto block h-[70vh] w-auto max-w-full"
+          // Le pays est très allongé : on borne la hauteur ET la largeur, sinon
+          // la carte déborde en paysage sur téléphone.
+          className="mx-auto block h-[62vh] max-h-180 w-auto max-w-full sm:h-[70vh]"
           role="img"
           aria-label="Carte des 16 clubs de Ligue 1 tunisienne"
         >
